@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jfeat.gateway.zuul.crud.services.domain.dao.QueryGatewayApiDao">
+    <sql id="Base_Column_List">
+        t_gateway_api.*
+    </sql>
+
+    <sql id="QueryOwnedOrgIds">
+        SELECT children.id FROM t_sys_org, t_sys_org as children WHERE t_sys_org.left_num &lt;= children.left_num AND
+        t_sys_org.right_num >= children.left_num and t_sys_org.id=#{ownerOrgId} order by t_sys_org.node_level ASC
+    </sql>
+
+
+    <select id="findGatewayApiPage" resultType="GatewayApiRecord" parameterType="GatewayApiRecord">
+        SELECT t_gateway_api.*
+        FROM t_gateway_api
+        WHERE 1=1
+        <if test="record.id != null and record.id>0 ">
+            AND t_gateway_api.id LIKE CONCAT('%',#{record.id},'%')
+        </if>
+        <if test="record.name != null and record.name!= ''">
+            AND t_gateway_api.name LIKE CONCAT('%',#{record.name},'%')
+        </if>
+        <if test="record.path != null and record.path!= ''">
+            AND t_gateway_api.path LIKE CONCAT('%',#{record.path},'%')
+        </if>
+
+        <if test="record.serviceId != null and record.serviceId!= ''">
+            AND t_gateway_api.service_id LIKE CONCAT('%',#{record.serviceId},'%')
+        </if>
+        <if test="record.url != null and record.url!= ''">
+            AND t_gateway_api.url LIKE CONCAT('%',#{record.url},'%')
+        </if>
+        <if test="record.retryable != null and record.retryable>0 ">
+            AND t_gateway_api.retryable LIKE CONCAT('%',#{record.retryable},'%')
+        </if>
+        <if test="record.enabled != null and record.enabled>0 ">
+            AND t_gateway_api.enabled LIKE CONCAT('%',#{record.enabled},'%')
+        </if>
+
+        <if test="record.stripPrefix != null and record.stripPrefix>0 ">
+            AND t_gateway_api.strip_prefix LIKE CONCAT('%',#{record.stripPrefix},'%')
+        </if>
+        <if test="startTime != null">
+            <![CDATA[AND t_gateway_api.start_time >= DATE(#{startTime})]]>
+        </if>
+        <if test="endTime != null">
+            <![CDATA[AND t_gateway_api.end_time <= DATE(#{endTime)]]>
+        </if>
+        <!--
+    <if test="search != null and search != ''">
+        OR t_gateway_api.name LIKE CONCAT('%',#{search},'%')
+    </if>
+    -->
+    </select>
+</mapper>
